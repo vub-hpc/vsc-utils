@@ -28,9 +28,8 @@ Utilities to allow interacting with a REST API as an application that
 was registered with the OAuth system of the web application.
 """
 import jsonpickle
-
-from vsc.utils.py2vs3 import Request, urlencode
-
+from urllib.parse import urlencode
+from urllib.request import Request
 
 def request_access_token(opener, path, client_id, client_secret):
     """
