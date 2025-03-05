@@ -32,17 +32,16 @@ Tests for the vsc.utils.zabbix module.
 import json
 import os
 import tempfile
-import time
 import sys
 import random
 import string
+from io import StringIO
 from pwd import getpwuid
 
 from vsc.install.testing import TestCase
 
-from vsc.utils.zabbix import ZabbixReporter, SimpleZabbix
+from vsc.utils.zabbix import ZabbixReporter
 from vsc.utils.nagios import NAGIOS_EXIT_OK, NAGIOS_EXIT_WARNING, NAGIOS_EXIT_CRITICAL, NAGIOS_EXIT_UNKNOWN
-from vsc.utils.py2vs3 import StringIO
 
 
 class TestZabbix(TestCase):
@@ -51,7 +50,7 @@ class TestZabbix(TestCase):
     def setUp(self):
         user = getpwuid(os.getuid())
         self.nagios_user = user.pw_name
-        super(TestZabbix, self).setUp()
+        super().setUp()
 
     def test_cache(self):
         """Test the caching mechanism in the reporter."""
@@ -61,7 +60,6 @@ class TestZabbix(TestCase):
 
         message = ''.join(random.choice(string.printable) for x in range(length))
         message = message.rstrip()
-        message = json.dumps([message])
 
         (handle, filename) = tempfile.mkstemp()
         os.unlink(filename)
@@ -72,7 +70,7 @@ class TestZabbix(TestCase):
 
         reporter.cache(nagios_exit, message)
 
-        (handle, output_filename) = tempfile.mkstemp()
+        (handle, _) = tempfile.mkstemp()
         os.close(handle)
 
         try:
@@ -85,9 +83,9 @@ class TestZabbix(TestCase):
             line = buffer.getvalue().rstrip()
             sys.stdout = old_stdout
             buffer.close()
-            self.assertTrue(err.code == nagios_exit[0])
+            self.assertEqual(err.code, nagios_exit[0])
             line = json.loads(line)
-            self.assertTrue(line["exit_string"] == nagios_exit[1])
-            self.assertTrue(line["message"][0] == json.loads(message)[0])
+            self.assertEqual(line["exit_string"], nagios_exit[1])
+            self.assertEqual(line["message"], message)
 
         os.unlink(filename)
