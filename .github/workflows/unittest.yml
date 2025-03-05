@@ -14,7 +14,7 @@ jobs:
     - name: install tox
       run: pip install 'virtualenv<20.22.0' 'tox<4.5.0'
     - name: add mandatory git remote
-      run: git remote add hpcugent https://github.com/hpcugent/vsc-utils.git
+      run: git remote add hpcugent https://github.com/vub-hpc/vsc-utils.git
     - name: Run tox
       run: tox -e py$(echo ${{ matrix.python }} | sed 's/\.//g')
     strategy:
