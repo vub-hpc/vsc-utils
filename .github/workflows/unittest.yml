@@ -6,9 +6,9 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: Setup Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python }}
     - name: install tox
@@ -16,7 +16,7 @@ jobs:
     - name: add mandatory git remote
       run: git remote add hpcugent https://github.com/hpcugent/vsc-utils.git
     - name: Run tox
-      run: tox -e py
+      run: tox -e py$(echo ${{ matrix.python }} | sed 's/\.//g')
     strategy:
       matrix:
         python:
