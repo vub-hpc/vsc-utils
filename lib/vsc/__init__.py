@@ -1,5 +1,5 @@
 #
-# Copyright 2015-2023 Ghent University
+# Copyright 2015-2025 Ghent University
 #
 # This file is part of vsc-utils,
 # originally created by the HPC team of Ghent University (http://ugent.be/hpc/en),
@@ -24,7 +24,9 @@
 # along with vsc-utils. If not, see <http://www.gnu.org/licenses/>.
 #
 """
-Allow other packages to extend this namespace, zip safe setuptools style
+Initialize vsc package.
+The vsc namespace is used in different folders along the system
+so explicitly declare this is also the vsc namespace.
 """
 import pkg_resources
 pkg_resources.declare_namespace(__name__)

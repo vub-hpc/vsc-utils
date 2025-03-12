@@ -1,7 +1,6 @@
-
 # -*- encoding: utf-8 -*-
 #
-# Copyright 2012-2023 Ghent University
+# Copyright 2012-2025 Ghent University
 #
 # This file is part of vsc-utils,
 # originally created by the HPC team of Ghent University (http://ugent.be/hpc/en),
@@ -44,7 +43,7 @@ class ZabbixReporter(NagiosReporter):
 
     def print_report_and_exit(self, timestamp, nagios_exit_code, nagios_exit_string, nagios_message):
         """Print the zabbix report and exit"""
-        print('{"timestamp": %f, "exit_string": "%s", "message": %s}' % (timestamp, nagios_exit_string, nagios_message))
+        print(json.dumps({"timestamp": timestamp, "exit_string": nagios_exit_string, "message": nagios_message}))
         self.log.info("Zabbix check cache file %s contents delivered: %s", self.filename, nagios_message)
         sys.exit(nagios_exit_code)
 

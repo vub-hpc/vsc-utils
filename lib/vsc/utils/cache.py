@@ -1,5 +1,5 @@
 #
-# Copyright 2012-2023 Ghent University
+# Copyright 2012-2025 Ghent University
 #
 # This file is part of vsc-utils,
 # originally created by the HPC team of Ghent University (http://ugent.be/hpc/en),
@@ -29,14 +29,15 @@ Caching utilities.
 @author: Andy Georges (Ghent University)
 """
 import gzip
-import jsonpickle
 import os
 import time
 import pickle
+import jsonpickle
+
 
 from vsc.utils import fancylogger
 
-class FileCache(object):
+class FileCache:
     """File cache with a timestamp safety.
 
     Stores data (something that can be pickled) into a dictionary
@@ -81,19 +82,19 @@ class FileCache(object):
                 try:
                     g = gzip.GzipFile(mode='rb', fileobj=f)  # no context manager available in python 26 yet
                     s = g.read()
-                except (IOError) as err:
+                except (OSError) as _:
                     self.log.error("Cannot load data from cache file %s as gzipped json", self.filename)
                     try:
                         f.seek(0)
                         self.shelf = pickle.load(f)
                     except pickle.UnpicklingError as err:
-                        msg = "Problem loading pickle data from %s (corrupt data)" % (self.filename,)
+                        msg = f"Problem loading pickle data from {self.filename} (corrupt data)"
                         if raise_unpickable:
                             self.log.raiseException(msg)
                         else:
                             self.log.error("%s. Continue with empty shelf: %s", msg, err)
                             self.shelf = {}
-                    except (OSError, IOError):
+                    except OSError:
                         self.log.raiseException("Could not load pickle data from %s", self.filename)
                 else:
                     try:
@@ -105,7 +106,7 @@ class FileCache(object):
                 finally:
                     g.close()
 
-        except (OSError, IOError, ValueError, FileNotFoundError) as err:
+        except (OSError, ValueError, FileNotFoundError) as err:
             self.log.warning("Could not access the file cache at %s [%s]", self.filename, err)
             self.shelf = {}
             self.log.info("Cache in %s starts with an empty shelf", (self.filename,))
@@ -142,7 +143,13 @@ class FileCache(object):
 
         @returns: (timestamp, data) if there is data for the given key, None otherwise.
         """
-        return self.new_shelf.get(key, None) or self.shelf.get(key, None)
+        result = None
+        if self.new_shelf is not None:
+            result = self.new_shelf.get(key, None)
+        if result is None and self.shelf is not None:
+            return self.shelf.get(key, None)
+
+        return result
 
     def retain(self):
         """Retain non-updated data on close."""
@@ -162,6 +169,8 @@ class FileCache(object):
                 self.log.error('cannot open the file cache at %s for writing', self.filename)
             else:
                 if self.retain_old:
+                    if self.shelf is None:
+                        self.shelf = {}
                     self.shelf.update(self.new_shelf)
                     self.new_shelf = self.shelf
 

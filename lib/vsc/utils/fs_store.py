@@ -1,5 +1,5 @@
 #
-# Copyright 2012-2023 Ghent University
+# Copyright 2012-2025 Ghent University
 #
 # This file is part of vsc-utils,
 # originally created by the HPC team of Ghent University (http://ugent.be/hpc/en),
@@ -96,7 +96,3 @@ def store_on_gpfs(user_name, path, key, information, gpfs, login_mount_point, gp
             gpfs.ignorerealpathmismatch = False
 
         logger.info("Stored user %s %s information at %s", user_name, key, filename)
-
-
-
-
