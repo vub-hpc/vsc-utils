@@ -60,6 +60,7 @@ class TestZabbix(TestCase):
 
         message = ''.join(random.choice(string.printable) for x in range(length))
         message = message.rstrip()
+        message = json.dumps([message])
 
         (handle, filename) = tempfile.mkstemp()
         os.unlink(filename)
@@ -86,6 +87,7 @@ class TestZabbix(TestCase):
             self.assertEqual(err.code, nagios_exit[0])
             line = json.loads(line)
             self.assertEqual(line["exit_string"], nagios_exit[1])
-            self.assertEqual(line["message"], message)
+            self.assertTrue(line["message"][0] == json.loads(message)[0])
+
 
         os.unlink(filename)
