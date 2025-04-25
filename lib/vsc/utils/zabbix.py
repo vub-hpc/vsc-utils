@@ -43,6 +43,9 @@ class ZabbixReporter(NagiosReporter):
 
     def print_report_and_exit(self, timestamp, nagios_exit_code, nagios_exit_string, nagios_message):
         """Print the zabbix report and exit"""
+        # this doest not work in general: we are not sure nagios_message is valid json, try something
+        if '"' not in nagios_message:
+            nagios_message = json.dumps(nagios_message)
         print('{"timestamp": %f, "exit_string": "%s", "message": %s}' % (timestamp, nagios_exit_string, nagios_message))
         self.log.info("Zabbix check cache file %s contents delivered: %s", self.filename, nagios_message)
         sys.exit(nagios_exit_code)
